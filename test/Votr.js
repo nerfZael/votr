@@ -266,6 +266,25 @@ contract("Votr", (accounts) => {
       const proposalStatus = await contractInstance.getProposalStatus(proposalId, {from: alice});
       assert.equal(proposalStatus, 'Passed');
     });
+
+    it("should delegate a vote to a delegate that has already voted", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
+  
+      await contractInstance.vote(proposalId, true, {from: bob});
+     
+      await contractInstance.delegate(proposalId, bob, {from: alice});
+
+      await contractInstance.vote(proposalId, false, {from: john});
+
+      await time.increase(time.duration.days(1));
+
+      const proposalStatus = await contractInstance.getProposalStatus(proposalId, {from: alice});
+      assert.equal(proposalStatus, 'Passed');
+    });
   });
 
   context("with the off-chain delegation scenario", async () => {
