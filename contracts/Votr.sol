@@ -3,6 +3,7 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Votr {
   event ProposalSubmitted(uint proposalId, string proposalName, address submittedBy);
+  event V(uint proposalId, bool toPass, uint weight);
 
   struct Proposal {
     string name;
@@ -12,8 +13,16 @@ contract Votr {
     address submittedBy;
   }
 
+  struct Voter {
+    bool hasVoted;
+    bool votedToPass;
+    uint voteWeight;
+    address delegatedTo;
+  }
+
   Proposal[] public proposals;
-  mapping(uint => bool) public hasVoted;
+  mapping(uint => Voter) public voters;
+  mapping(address => address) public delegations;
 
   function submitProposal(string calldata proposalName, uint duration) external {
     proposals.push(Proposal(
@@ -41,17 +50,59 @@ contract Votr {
     }
   }
 
-  function vote(uint proposalId, bool shouldPass) public isVotingOngoing(proposalId) {
+  function vote(uint proposalId, bool shouldPass) public isVotingOngoing(proposalId) senderHasNotVoted(proposalId) {
     uint voterId = getVoterId(msg.sender, proposalId);
 
-    require(!hasVoted[voterId], "Already voted on this proposal!");
+    Voter storage voter = voters[voterId];
 
-    hasVoted[voterId] = true;
+    voter.hasVoted = true;
 
     if(shouldPass) {
-      proposals[proposalId].passCount++;
+      voter.votedToPass = true;
+      //+1 because default weight should be 1 and it defaults to 0
+      proposals[proposalId].passCount += voter.voteWeight + 1;
+      emit V(proposalId, true, voter.voteWeight + 1);
     } else {
-      proposals[proposalId].rejectCount++;
+      //+1 because default weight should be 1 and it defaults to 0
+      proposals[proposalId].rejectCount += voter.voteWeight + 1;
+      emit V(proposalId, false, voter.voteWeight + 1);
+    }
+  }
+
+  function delegate(uint proposalId, address delegateAddress) public isVotingOngoing(proposalId) senderHasNotVoted(proposalId) {
+    require(msg.sender != delegateAddress, "Delegating to self is not allowed!");
+
+    while (voters[getVoterId(delegateAddress, proposalId)].delegatedTo != address(0)) {
+      delegateAddress = voters[getVoterId(delegateAddress, proposalId)].delegatedTo;
+
+      require(msg.sender != delegateAddress, "Delegation loops are not allowed!");
+    }
+
+    uint voterId = getVoterId(msg.sender, proposalId);
+
+    Voter storage voter = voters[voterId];
+
+    voter.hasVoted = true;
+    voter.delegatedTo = delegateAddress;
+
+    delegations[msg.sender] = delegateAddress;
+
+    uint delegateVoterId = getVoterId(delegateAddress, proposalId);
+    Voter storage delegateVoter = voters[delegateVoterId];
+
+    if (delegateVoter.hasVoted) {
+      if(delegateVoter.votedToPass) {
+        //+1 because default weight should be 1 and it defaults to 0
+        proposals[proposalId].passCount += voter.voteWeight + 1;
+        emit V(proposalId, true, voter.voteWeight + 1);
+      } else {
+        //+1 because default weight should be 1 and it defaults to 0
+        proposals[proposalId].rejectCount += voter.voteWeight + 1;
+        emit V(proposalId, false, voter.voteWeight + 1);
+      }
+    } else {
+      //+1 because default weight should be 1 and it defaults to 0
+      delegateVoter.voteWeight += voter.voteWeight + 1;
     }
   }
 
@@ -64,4 +115,12 @@ contract Votr {
     _;
   }
 
+  modifier senderHasNotVoted(uint proposalId) {
+    uint voterId = getVoterId(msg.sender, proposalId);
+
+    Voter storage voter = voters[voterId];
+
+    require(!voter.hasVoted, "Already voted on this proposal!");
+    _;
+  }
 }
