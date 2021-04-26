@@ -3,7 +3,6 @@ pragma solidity >=0.7.0 <0.9.0;
 
 contract Votr {
   event ProposalSubmitted(uint proposalId, string proposalName, address submittedBy);
-  event V(uint proposalId, bool toPass, uint weight);
 
   struct Proposal {
     string name;
@@ -61,11 +60,9 @@ contract Votr {
       voter.votedToPass = true;
       //+1 because default weight should be 1 and it defaults to 0
       proposals[proposalId].passCount += voter.voteWeight + 1;
-      emit V(proposalId, true, voter.voteWeight + 1);
     } else {
       //+1 because default weight should be 1 and it defaults to 0
       proposals[proposalId].rejectCount += voter.voteWeight + 1;
-      emit V(proposalId, false, voter.voteWeight + 1);
     }
   }
 
@@ -94,11 +91,9 @@ contract Votr {
       if(delegateVoter.votedToPass) {
         //+1 because default weight should be 1 and it defaults to 0
         proposals[proposalId].passCount += voter.voteWeight + 1;
-        emit V(proposalId, true, voter.voteWeight + 1);
       } else {
         //+1 because default weight should be 1 and it defaults to 0
         proposals[proposalId].rejectCount += voter.voteWeight + 1;
-        emit V(proposalId, false, voter.voteWeight + 1);
       }
     } else {
       //+1 because default weight should be 1 and it defaults to 0
