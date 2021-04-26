@@ -5,11 +5,9 @@ export default () => {
   const [userAccount, setUserAccount] = useState<string>('');
  
   useEffect(() => {
-    (async () => {
-      web3.eth.requestAccounts().then(accounts => {
-        setUserAccount(accounts[0]);
-      });
-    })();
+    web3.eth.requestAccounts().then(accounts => {
+      setUserAccount(accounts[0]);
+    });
   }, []);
 
   return userAccount;
