@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Proposal } from "../../models/Proposal";
+import votrService from "../../services/votrService";
 
 
-const VotingSection: React.FC<{userAccount: string, proposal: Proposal | null }> = ({ userAccount, proposal }) => {
-  const [show, setShow] = useState(true);
-
+const VotingSection: React.FC<{userAccount: string, proposal: Proposal }> = ({ userAccount, proposal }) => {
   return (
     <div>
-      <button className="btn btn-success">
+      <button className="btn btn-success" onClick={e => votrService.vote(userAccount, proposal.id, true)}>
         Pass
       </button>
-      <button className="btn btn-danger">
+      <button className="btn btn-danger" onClick={e => votrService.vote(userAccount, proposal.id, false)}>
         Reject
       </button>
     </div>
@@ -20,10 +19,8 @@ const VotingSection: React.FC<{userAccount: string, proposal: Proposal | null }>
 
 
 const ProposalModal: React.FC<{userAccount: string, proposal: Proposal | null, handleClose: () => void }> = ({ userAccount, proposal, handleClose }) => {
-  const [show, setShow] = useState(true);
-
   return (
-    <Modal show={show} onHide={handleClose} contentClassName="">
+    <Modal show={true} onHide={handleClose} contentClassName="">
       <Modal.Header closeButton>
         <Modal.Title>
           Proposal
@@ -43,14 +40,6 @@ const ProposalModal: React.FC<{userAccount: string, proposal: Proposal | null, h
             : ''
         }
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-        <Button variant="primary" onClick={handleClose}>
-          Save Changes
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 }

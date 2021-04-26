@@ -9,6 +9,13 @@ export default {
         console.log(receipt);
       });
   },
+  vote(account: string, proposalId: number, shouldPass: boolean) {
+    return votrContract.methods.vote(proposalId.toString(), shouldPass)
+      .send({ from: account })
+      .on("receipt", (receipt: any) => {
+        console.log(receipt);
+      });
+  },
   getProposalStatus(proposalId: number): Promise<any> {
     return votrContract.methods.getProposalStatus(proposalId)
       .call();
