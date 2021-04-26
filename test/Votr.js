@@ -167,4 +167,111 @@ contract("Votr", (accounts) => {
       assert.equal(proposalStatus, 'Passed');
     });
   });
+
+  
+  context("with the standard delegate voting scenario", async () => {
+    xit("should be able to delegate own vote", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      const delegateResult = await contractInstance.delegate(proposalId, bob, {from: alice});
+
+      assert.equal(delegateResult.receipt.status, true);
+    });
+
+    xit("should not be able to delegate own vote if already voted", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await contractInstance.vote(proposalId, true, {from: alice});
+  
+      await utils.shouldThrow(contractInstance.delegate(proposalId, bob, {from: alice}));
+    });
+
+    xit("should not be able to vote if already delegated own vote", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await contractInstance.delegate(proposalId, bob, {from: alice});
+  
+      await utils.shouldThrow(contractInstance.vote(proposalId, true, {from: alice}));
+    });
+
+    xit("should be able to be a delegate for multiple people", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await contractInstance.delegate(proposalId, alice, {from: bob});
+  
+      const delegateResult = await contractInstance.delegate(proposalId, alice, {from: john});
+
+      assert.equal(delegateResult.receipt.status, true);
+    });
+
+    xit("should not be able to delegate vote to self", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await utils.shouldThrow(contractInstance.delegate(proposalId, alice, {from: alice}));
+    });
+  
+    xit("should not be able to cause a loop in delagation", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+
+      await contractInstance.delegate(proposalId, bob, {from: alice});
+
+      await contractInstance.delegate(proposalId, john, {from: bob});
+
+      await utils.shouldThrow(contractInstance.delegate(proposalId, alice, {from: john}));
+    });
+
+    xit("should be able to vote as a delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await contractInstance.delegate(proposalId, bob, {from: alice});
+
+      const voteResult = await contractInstance.vote(proposalId, true, {from: bob});
+
+      assert.equal(voteResult.receipt.status, true);
+    });
+
+    xit("should count a delegated vote with more weight", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      await contractInstance.delegate(proposalId, bob, {from: alice});
+
+      await contractInstance.vote(proposalId, true, {from: bob});
+      await contractInstance.vote(proposalId, false, {from: john});
+
+      const proposalStatus = await contractInstance.getProposalStatus(proposalId, {from: alice});
+      assert.equal(proposalStatus, 'Passed');
+    });
+  });
 })
