@@ -16,23 +16,22 @@ contract("Votr", (accounts) => {
   });
 
   context("with the standard voting scenario", async () => {
-    xit("should be able to submit a proposal", async () => {
+    it("should be able to submit a proposal", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
       const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
   
       assert.equal(result.receipt.status, true);
-      assert.equal(result.receipt.logs[0].returnValues.proposalName, proposalName);
+      assert.equal(result.receipt.logs[0].args.proposalName, proposalName);
     });
   
-    xit("should be able to vote on a proposal", async () => {
+    it("should be able to vote on a proposal", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       const result1 = await contractInstance.vote(proposalId, true, {from: alice});
       const result2 = await contractInstance.vote(proposalId, false, {from: bob});
@@ -41,13 +40,12 @@ contract("Votr", (accounts) => {
       assert.equal(result2.receipt.status, true);
     });
   
-    xit("should not able to vote more than once on a proposal", async () => {
+    it("should not able to vote more than once on a proposal", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId, true, {from: alice});
   
@@ -55,13 +53,12 @@ contract("Votr", (accounts) => {
       await utils.shouldThrow(contractInstance.vote(proposalId, false, {from: alice}));
     });
   
-    xit("should not able to vote on a proposal once voting ends", async () => {
+    it("should not able to vote on a proposal once voting ends", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId, true, {from: alice});
   
@@ -70,13 +67,12 @@ contract("Votr", (accounts) => {
       await utils.shouldThrow(contractInstance.vote(proposalId, false, {from: bob}));
     });
   
-    xit("should be able to get proposal status (Pending and Passed)", async () => {
+    it("should be able to get proposal status (Pending and Passed)", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       let proposalStatus = await contractInstance.getProposalStatus(proposalId, {from: alice});
       assert.equal(proposalStatus, 'Pending');
@@ -92,13 +88,12 @@ contract("Votr", (accounts) => {
       assert.equal(proposalStatus, 'Passed');
     });
   
-    xit("should be able to get proposal status (Pending and Tied)", async () => {
+    it("should be able to get proposal status (Pending and Tied)", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId, true, {from: alice});
   
@@ -113,13 +108,12 @@ contract("Votr", (accounts) => {
       assert.equal(proposalStatus, 'Tied');
     });
   
-    xit("should be able to get proposal status (Pending and Rejected)", async () => {
+    it("should be able to get proposal status (Pending and Rejected)", async () => {
       const proposalName = proposals[0];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName, duration, {from: alice});
-  
-      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId, true, {from: alice});
   
@@ -136,14 +130,13 @@ contract("Votr", (accounts) => {
       assert.equal(proposalStatus, 'Rejected');
     });
 
-    xit("should be able to get status of a previous proposal", async () => {
+    it("should be able to get status of a previous proposal", async () => {
       const proposalName1 = proposals[0];
       const proposalName2 = proposals[1];
       const duration = time.duration.days(1);
   
-      await contractInstance.submitProposal(proposalName1, duration, {from: alice});
-  
-      const proposalId1 = result.receipt.logs[0].returnValues.proposalId;
+      const result = await contractInstance.submitProposal(proposalName1, duration, {from: alice});
+      const proposalId1 = result.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId1, true, {from: alice});
   
@@ -152,9 +145,8 @@ contract("Votr", (accounts) => {
       proposalStatus = await contractInstance.getProposalStatus(proposalId1, {from: alice});
       assert.equal(proposalStatus, 'Passed');
 
-      await contractInstance.submitProposal(proposalName2, duration, {from: alice});
-  
-      const proposalId2 = result.receipt.logs[0].returnValues.proposalId;
+      const result2 = await contractInstance.submitProposal(proposalName2, duration, {from: alice});
+      const proposalId2 = result2.receipt.logs[0].args.proposalId;
   
       await contractInstance.vote(proposalId2, false, {from: alice});
   
@@ -168,7 +160,6 @@ contract("Votr", (accounts) => {
     });
   });
 
-  
   context("with the standard delegate voting scenario", async () => {
     xit("should be able to delegate own vote", async () => {
       const proposalName = proposals[0];

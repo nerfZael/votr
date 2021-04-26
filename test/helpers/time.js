@@ -1,17 +1,25 @@
-async function increase(duration) {
-  await web3.currentProvider.sendAsync({
-      jsonrpc: "2.0",
-      method: "evm_increaseTime",
-      params: [duration],
-      id: new Date().getTime()
-  }, () => {});
+function increase(duration) {
+  return new Promise((resolve, reject) => {
+    web3.currentProvider.send({
+        jsonrpc: "2.0",
+        method: "evm_increaseTime",
+        params: [duration],
+        id: new Date().getTime()
+    }, (error, result) => {
+      if (error) return reject(error);
 
-  web3.currentProvider.send({
-      jsonrpc: '2.0',
-      method: 'evm_mine',
-      params: [],
-      id: new Date().getTime()
-  })
+      web3.currentProvider.send({
+        jsonrpc: '2.0',
+        method: 'evm_mine',
+        params: [],
+        id: new Date().getTime()
+      }, (error, result) => {
+        if (error) return reject(error);
+
+        resolve(result);
+      });
+    });
+	});
 }
 
 const duration = {
