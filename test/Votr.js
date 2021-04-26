@@ -270,8 +270,117 @@ contract("Votr", (accounts) => {
       await contractInstance.vote(proposalId, true, {from: bob});
       await contractInstance.vote(proposalId, false, {from: john});
 
+      await time.increase(time.duration.days(1));
+
       const proposalStatus = await contractInstance.getProposalStatus(proposalId, {from: alice});
       assert.equal(proposalStatus, 'Passed');
+    });
+  });
+
+  context("with the off-chain delegation scenario", async () => {
+    const getSignedDelegation = async (voterAddress, proposalId, delegateAddress) => {
+      const hashedMessage = web3.utils.soliditySha3(delegateAddress, proposalId, contractInstance.address);
+
+      const signature = await utils.sign(hashedMessage, voterAddress);
+
+      return signature;
+    }
+
+    xit("should be able to submit off-chain votes as a delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+      const signatureJohn = await getSignedDelegation(john, proposalId, bob);
+
+      const voteResult = await contractInstance.voteAsDelegate(proposalId, true, [signatureAlice, signatureJohn], {from: bob});
+      assert.equal(voteResult.receipt.status, true);
+    });
+
+    xit("should not be able to submit off-chain votes as a non delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+
+      await utils.shouldThrow(contractInstance.voteAsDelegate(proposalId, true [signatureAlice], {from: john}));
+    });
+
+    xit("should not be able to submit a single off-chain vote multiple times as a delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+
+      await contractInstance.voteAsDelegate(proposalId, true, [signatureAlice], {from: bob});
+
+      await utils.shouldThrow(contractInstance.voteAsDelegate(proposalId, true [signatureAlice], {from: bob}));
+    });
+
+    
+    xit("should be able to vote and then vote as delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+
+      await contractInstance.vote(proposalId, true, {from: bob})
+
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+      const voteResult = await contractInstance.voteAsDelegate(proposalId, true, [signatureAlice], {from: bob});
+
+      assert.equal(voteResult.receipt.status, true);
+    });
+
+    xit("should not be able to vote after voting as delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+  
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+
+      await contractInstance.voteAsDelegate(proposalId, true, [signatureAlice], {from: bob});
+
+      await utils.shouldThrow(contractInstance.vote(proposalId, true, {from: bob}));
+    });
+
+    xit("should not be able to vote to pass and then vote to reject as delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+
+      await contractInstance.vote(proposalId, true, {from: bob})
+
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+      await utils.shouldThrow(contractInstance.voteAsDelegate(proposalId, false, [signatureAlice], {from: bob}));
+    });
+
+    xit("should not be able to vote to pass as delegate and then vote to reject as delegate", async () => {
+      const proposalName = proposals[0];
+      const duration = time.duration.days(1);
+  
+      const result = await contractInstance.submitProposal(proposalName, duration, {from: alice});
+      const proposalId = result.receipt.logs[0].returnValues.proposalId;
+
+      const signatureAlice = await getSignedDelegation(alice, proposalId, bob);
+      await contractInstance.voteAsDelegate(proposalId, true, [signatureAlice], {from: bob});
+
+      const signatureJohn = await getSignedDelegation(signatureJohn, proposalId, bob);
+      await utils.shouldThrow(contractInstance.voteAsDelegate(proposalId, false, [signatureJohn], {from: bob}));
     });
   });
 })
