@@ -13,7 +13,7 @@ const SubmitProposalWidget: React.FC<{userAccount: string}> = ({ userAccount }) 
         <div className="">
           <div className="">
             <input type="text" className="form-control" onChange={e => setProposalName(e.target.value)}/>
-            <button type="button" className="btn btn-success" onClick={async e => await votrService.submitProposal(userAccount, proposalName, 0)}>Submit</button>
+            <button type="button" className="btn btn-success" onClick={async e => await votrService.submitProposal(userAccount, proposalName, 100)}>Submit</button>
           </div>
         </div>
       </div>

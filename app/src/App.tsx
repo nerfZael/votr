@@ -21,7 +21,7 @@ export default () => {
 
       <SubmitProposalWidget userAccount={userAccount} />     
 
-      <ProposalsTable />
+      <ProposalsTable userAccount={userAccount}/>
 
       <ToastContainer />
     </div>

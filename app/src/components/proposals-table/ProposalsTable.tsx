@@ -3,15 +3,13 @@ import votrService from '../../services/votrService';
 import useContractEvents from '../shared/useContractEvents';
 import { toast } from 'react-toastify';
 import votrContract from '../../services/votrContract';
+import ProposalModal from '../proposal-modal/ProposalModal';
+import { Proposal } from '../../models/Proposal';
 
-type Proposal = {
-  id: number;
-  name: string;
-  status: string;
-};
-
-const ProposalsTable: React.FC<{}> = () => {
+const ProposalsTable: React.FC<{userAccount: string}> = ({ userAccount }) => {
   const [proposals, setProposals] = useState<Proposal[]>([]);
+  const [show, setShow] = useState(false);
+  const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
 
   const proposalSubmittedEvents = useContractEvents(
     votrContract, 
@@ -45,7 +43,21 @@ const ProposalsTable: React.FC<{}> = () => {
         setProposals(newProposals);
       });
     }
-  }, [proposalSubmittedEvents])
+  }, [proposalSubmittedEvents]);
+
+  function openProposalModal(proposal: Proposal) {
+    setShow(true);
+  }
+
+  useEffect(() => {
+
+  }, [selectedProposal]);
+
+  let proposalModal = selectedProposal
+    ? (
+      <ProposalModal userAccount={userAccount} proposal={selectedProposal} handleClose={() => setSelectedProposal(null) }/>
+    )
+    : '';
 
   return (
     <div className="card widget">
@@ -65,7 +77,7 @@ const ProposalsTable: React.FC<{}> = () => {
               { 
                 proposals.map((x, i) => {
                   return (
-                    <tr key={i} className="">
+                    <tr key={i} className="" onClick={e => setSelectedProposal(x)}>
                       <td>{x.name}</td>
                       <td>{x.status}</td>
                     </tr>
@@ -76,6 +88,8 @@ const ProposalsTable: React.FC<{}> = () => {
           </table>
         </div>
       </div>
+
+      {proposalModal}
     </div>
   );
 }
