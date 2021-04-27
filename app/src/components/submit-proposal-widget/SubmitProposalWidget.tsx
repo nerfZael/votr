@@ -15,7 +15,7 @@ const SubmitProposalWidget: React.FC<{userAccount: string}> = ({ userAccount }) 
         <div className="">
           <div className="">
             <input className="proposal-name-input form-control" placeholder="Proposal name..." type="text" onChange={e => setProposalName(e.target.value)}/>
-            <input className="proposal-name-input form-control" placeholder="Duration in seconds..." type="text" onChange={e => setProposalDuration(e.target.value)}/>
+            <input className="proposal-name-input form-control" placeholder="Duration in seconds..." type="number" onChange={e => setProposalDuration(Number(e.target.value))}/>
             <button type="button" className="btn btn-success" onClick={async e => await votrService.submitProposal(userAccount, proposalName, proposalDuration)}>Submit</button>
           </div>
         </div>
