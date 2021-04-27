@@ -30,14 +30,16 @@ const ProposalsTable: React.FC<{userAccount: string}> = ({ userAccount }) => {
       var promises: Promise<any>[] = [];
 
       for(let proposal of newProposals) {
-        const promise = votrService.getProposalStatus(proposal.id);
+        const promise = votrService.getProposalInfo(proposal.id);
 
         promises.push(promise);
       }
 
-      Promise.all(promises).then((statuses: string[]) => {
-        for(let i = 0; i < statuses.length; i++) {
-          newProposals[i].status = statuses[i];
+      Promise.all(promises).then((infos: any[]) => {
+        for(let i = 0; i < infos.length; i++) {
+          newProposals[i].status = infos[i].status;
+          newProposals[i].passCount = infos[i].passCount;
+          newProposals[i].rejectCount = infos[i].rejectCount;
         }
 
         setProposals(newProposals);

@@ -77,5 +77,9 @@ export default {
   getProposalStatus(proposalId: number): Promise<any> {
     return votrContract.methods.getProposalStatus(proposalId)
       .call();
+  },
+  getProposalInfo(proposalId: number): Promise<any> {
+    return votrContract.methods.getProposalInfo(proposalId)
+      .call();
   }
 };

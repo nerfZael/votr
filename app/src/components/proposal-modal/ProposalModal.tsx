@@ -98,6 +98,12 @@ const ProposalModal: React.FC<{userAccount: string, proposal: Proposal | null, h
         <div>
           Status: {proposal?.status}
         </div>
+        <div>
+          Number of pass votes: {proposal?.passCount}
+        </div>
+        <div>
+          Number of reject votes: {proposal?.rejectCount}
+        </div>
 
         {
           proposal?.status === 'Pending'

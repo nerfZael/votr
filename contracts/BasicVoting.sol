@@ -12,6 +12,15 @@ contract BasicVoting {
     address submittedBy;
   }
 
+  struct ProposalInfo {
+    string name;
+    string status;
+    uint passCount;
+    uint rejectCount;
+    uint expirationTime;
+    address submittedBy;
+  }
+
   struct Voter {
     bool hasVoted;
     bool votedToPass;
@@ -33,6 +42,29 @@ contract BasicVoting {
     ));
 
     emit ProposalSubmitted(proposals.length - 1, proposalName, msg.sender);
+  }
+
+  function getProposalInfo(uint proposalId) external view returns (ProposalInfo memory) {
+    Proposal memory proposal = proposals[proposalId];
+
+    string memory status = "Tied";
+
+    if(proposal.expirationTime > block.timestamp) {
+      status = "Pending";
+    } else if(proposal.passCount > proposal.rejectCount) {
+      status = "Passed";
+    } else if(proposal.passCount < proposal.rejectCount) {
+      status = "Rejected";
+    }
+
+    return ProposalInfo(
+      proposal.name,
+      status,
+      proposal.passCount,
+      proposal.rejectCount,
+      proposal.expirationTime,
+      proposal.submittedBy
+    );
   }
 
   function getProposalStatus(uint proposalId) public view returns (string memory) {
