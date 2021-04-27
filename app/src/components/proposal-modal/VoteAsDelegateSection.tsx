@@ -4,6 +4,7 @@ import { Proposal } from "../../models/Proposal";
 import votrService from "../../services/votrService";
 import { Voter } from '../../models/Voter';
 import Form from 'react-bootstrap/Form';
+import './VoteAsDelegateSection.scss';
 
 const VoteAsDelegateSection: React.FC<{userAccount: string, proposal: Proposal }> = ({ userAccount, proposal }) => {
   
@@ -20,10 +21,12 @@ const VoteAsDelegateSection: React.FC<{userAccount: string, proposal: Proposal }
   }
 
   return (
-    <div>
-      <span><strong>Vote as delegate</strong></span>
+    <div className="VoteAsDelegateSection">
+      <div className="title">
+        <strong>Vote as delegate</strong>
+      </div>
       
-      <div className="card widget">
+      <div className="card bg-dark">
         <div className="card-header">
           Voters
         </div>
@@ -57,9 +60,14 @@ const VoteAsDelegateSection: React.FC<{userAccount: string, proposal: Proposal }
         </div>
       </div>
 
-      <button type="button" className="btn btn-info" onClick={async e => setVoters(x => [...x, new Voter('')])}>Add voter</button>
-      <button type="button" className="btn btn-success" onClick={async e => await votrService.voteAsDelegate(userAccount, proposal.id, true, voters)}>Vote to pass</button>
-      <button type="button" className="btn btn-danger" onClick={async e => await votrService.voteAsDelegate(userAccount, proposal.id, false, voters)}>Vote to reject</button>
+      <div className="btn-container">
+        <div className="add-voter-btn">
+          <button type="button" className="btn btn-info" onClick={async e => setVoters(x => [...x, new Voter('')])}>Add voter</button>
+        </div>
+        <button type="button" className="btn btn-success pass-btn" onClick={async e => await votrService.voteAsDelegate(userAccount, proposal.id, true, voters)}>Vote to pass</button>
+        <button type="button" className="btn btn-danger" onClick={async e => await votrService.voteAsDelegate(userAccount, proposal.id, false, voters)}>Vote to reject</button>
+      </div>
+     
     </div>
   );
 };

@@ -5,27 +5,30 @@ import votrService from "../../services/votrService";
 import { Voter } from '../../models/Voter';
 import Form from 'react-bootstrap/Form';
 import VotingSection from './VotingSection';
+import './ProposalModal.scss';
 
 const ProposalModal: React.FC<{userAccount: string, proposal: Proposal | null, handleClose: () => void }> = ({ userAccount, proposal, handleClose }) => {
+  
   return (
-    <Modal show={true} onHide={handleClose} contentClassName="">
+    <Modal size="lg" show={true} onHide={handleClose} contentClassName="bg-dark ProposalModal">
       <Modal.Header closeButton>
         <Modal.Title>
-          Proposal
+          Proposal: {proposal?.name}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div>
-          Name: {proposal?.name}
+        <div className="status">
+          Status: <span className={proposal?.status}>{proposal?.status}</span>
         </div>
-        <div>
-          Status: {proposal?.status}
-        </div>
-        <div>
-          Number of pass votes: {proposal?.passCount}
-        </div>
-        <div>
-          Number of reject votes: {proposal?.rejectCount}
+
+        <div className="vote-cnt">
+          <div>
+           Pass votes: {proposal?.passCount}
+          </div>
+          <div>
+            Reject votes: {proposal?.rejectCount}
+          </div>
+
         </div>
 
         {

@@ -1,0 +1,36 @@
+.VoteAsDelegateSection {
+  .title {
+    margin-bottom: 10px;
+  }
+
+  .widget {
+    background-color: #1e1a357a;
+  }
+  .table {
+    background-color: #212f2361;
+    color: #f3ebeb;
+    border: 1px solid #a5a5a5;
+
+    .form-control {
+      color: #ffffff;
+
+      &:disabled {
+        color: #ffffff;
+        background-color: #161f27;
+      }
+    }
+  }
+
+  .btn-container {
+    margin-top: 10px;
+    display: flex;
+
+    .add-voter-btn {
+      flex-grow: 1;
+    }
+
+    .pass-btn {
+      margin-right: 10px;
+    }
+  }
+}

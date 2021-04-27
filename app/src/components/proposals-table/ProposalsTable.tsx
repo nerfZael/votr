@@ -62,7 +62,7 @@ const ProposalsTable: React.FC<{userAccount: string}> = ({ userAccount }) => {
     : '';
 
   return (
-    <div className="card widget">
+    <div className="ProposalsTable card widget bg-dark">
       <div className="card-header">
         Proposals
       </div>
@@ -73,6 +73,8 @@ const ProposalsTable: React.FC<{userAccount: string}> = ({ userAccount }) => {
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Status</th>
+                <th scope="col">Pass</th>
+                <th scope="col">Reject</th>
               </tr>
             </thead>
             <tbody>
@@ -82,6 +84,8 @@ const ProposalsTable: React.FC<{userAccount: string}> = ({ userAccount }) => {
                     <tr key={i} className="" onClick={e => setSelectedProposal(x)}>
                       <td>{x.name}</td>
                       <td>{x.status}</td>
+                      <td>{x.passCount}</td>
+                      <td>{x.rejectCount}</td>
                     </tr>
                   );
                 })

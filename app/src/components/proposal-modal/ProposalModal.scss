@@ -1,0 +1,25 @@
+.ProposalModal {
+  .Pending {
+    color: #e4ff00;
+  }
+
+  .Passed {
+    color: #00d81b;
+  }
+
+  .Tied {
+    color: #a4d9ff;
+  }
+
+  .Rejected {
+    color: #ff3717;
+  }
+
+  .status {
+    margin-bottom: 10px;
+  }
+
+  .vote-cnt {
+    margin-bottom: 10px;
+  }
+}

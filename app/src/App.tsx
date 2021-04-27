@@ -16,13 +16,19 @@ export default () => {
   return (
     <div className="App">
       <h1>Votr</h1>
+      <span>(Off-chain voting via delegates)</span>
 
-      <EthAccountDetails account={userAccount} />     
+      <div className="widgets-container">
+        <div>
+          <EthAccountDetails account={userAccount} />     
 
-      <SubmitProposalWidget userAccount={userAccount} />     
+          <SubmitProposalWidget userAccount={userAccount} />
+        </div>
 
-      <ProposalsTable userAccount={userAccount}/>
-
+        <div className="second-column">
+          <ProposalsTable userAccount={userAccount}/>
+        </div>
+      </div>     
       <ToastContainer />
     </div>
   );

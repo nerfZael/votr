@@ -6,17 +6,20 @@ import { Voter } from '../../models/Voter';
 import Form from 'react-bootstrap/Form';
 import DelegateVoteSection from './DelegateVoteSection';
 import VoteAsDelegateSection from "./VoteAsDelegateSection";
+import "./VotingSection.scss";
 
 const VotingSection: React.FC<{userAccount: string, proposal: Proposal }> = ({ userAccount, proposal }) => {
 
   return (
-    <div>
-      <button className="btn btn-success" onClick={e => votrService.vote(userAccount, proposal.id, true)}>
-        Pass
-      </button>
-      <button className="btn btn-danger" onClick={e => votrService.vote(userAccount, proposal.id, false)}>
-        Reject
-      </button>
+    <div className="VotingSection">
+      <div className="voting-buttons">
+        <button className="btn btn-success pass-btn" onClick={e => votrService.vote(userAccount, proposal.id, true)}>
+          Pass
+        </button>
+        <button className="btn btn-danger" onClick={e => votrService.vote(userAccount, proposal.id, false)}>
+          Reject
+        </button>
+      </div>
 
       <DelegateVoteSection userAccount={userAccount} proposal={proposal}/>
      
