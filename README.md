@@ -17,7 +17,7 @@ With a single user holding dozens of governance tokens, it is improbable that an
 
 ## Time-Frame 
 
-~10 hours.
+11 hours.
 
 ## Features
 Within the app, the user can: 
